@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.util.List;
 
 import ch.digitecgalaxus.modul_335_projekt.Service.ApiService;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,9 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private double latitude;
 
     private double longitude;
+    OkHttpClient client = new OkHttpClient();
 
-
-
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,52 +40,42 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         input = findViewById(R.id.input);
 
-        Intent intent = new Intent(MainActivity.this, ApiService.class);
-        intent.putExtra("input", input.getText());
-        startActivity(intent);
 
-        Intent connIntent = new Intent(this, ApiService.class);
-        bindService(connIntent, connection, Context.BIND_AUTO_CREATE);
-
-        try {
-            latitudeAndLongitude = apiService.implementGeocoder(input);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        Intent connIntent = new Intent(this, ApiService.class);
+//        bindService(connIntent, connection, Context.BIND_AUTO_CREATE);
     }
 
-    public void switchView(View view) throws IOException {
+    public void switchView(View view) {
 
-        Intent intent = new Intent(this, WeatherActivity.class);
-        intent.putExtra("location", input.getText().toString());
-        System.out.println(input.getText());
+        Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
+        intent.putExtra("input", input.getText().toString());
         startActivity(intent);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService(connection);
-        serviceBound = false;
-    }
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ApiService.LocalBinder binder = (ApiService.LocalBinder) service;
-            apiService = binder.getService();
-            serviceBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            serviceBound = false;
-        }
-    };
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        unbindService(connection);
+//        serviceBound = false;
+//    }
+//    /** Defines callbacks for service binding, passed to bindService() */
+//    private ServiceConnection connection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName className,
+//                                       IBinder service) {
+//            // We've bound to LocalService, cast the IBinder and get LocalService instance
+//            ApiService.LocalBinder binder = (ApiService.LocalBinder) service;
+//            apiService = binder.getService();
+//            serviceBound = true;
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName arg0) {
+//            serviceBound = false;
+//        }
+//    };
 }
