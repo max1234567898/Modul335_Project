@@ -12,11 +12,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.digitecgalaxus.modul_335_projekt.WeatherActivity;
+
 public class ApiService extends Service {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
+    public static final String LongAndAti = "LongAndAti";
 
     public List<Double> implementGeocoder(EditText inputFromField) throws IOException {
         List<Double> resultList = new ArrayList<>();
@@ -26,9 +25,40 @@ public class ApiService extends Service {
         Double latitude = geocode.get(0).getLatitude();
         Double longitude = geocode.get(0).getLongitude();
 
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(WeatherActivity.LongAndAti);
+        broadcastIntent.putExtra("longitude", longitude);
+        broadcastIntent.putExtra("latitude", latitude);
+        sendBroadcast(broadcastIntent);
+
         resultList.add(latitude);
         resultList.add(longitude);
         return resultList;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent.getAction().equals(LongAndAti)) {
+            Geocoder geocoder = new Geocoder(this);
+            String inputFromField = intent.getStringExtra("location");
+
+            List<Address> geocode = null;
+            try {
+                geocode = geocoder.getFromLocationName(inputFromField, 1);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            Double latitude = geocode.get(0).getLatitude();
+            Double longitude = geocode.get(0).getLongitude();
+
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(WeatherActivity.LongAndAti);
+            broadcastIntent.putExtra("longitude", longitude);
+            broadcastIntent.putExtra("latitude", latitude);
+            sendBroadcast(broadcastIntent);
+        }
+        return START_NOT_STICKY;
     }
 
     // Binder given to clients
